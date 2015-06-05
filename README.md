@@ -1,5 +1,7 @@
 # CloudPyPI - minimal PyPI server for use with pip/easy_install
 
+[![Build Status](https://travis-ci.org/vendasta/cloudpypi.svg)](https://travis-ci.org/vendasta/cloudpypi)
+
 CloudPyPI is a minimal PyPI compatible server hosted on Google App Engine with
 packages served from Cloud Storage. CloudPyPI includes an authentication
 and authorization framework for securing your private packages. Any packages not
