@@ -29,10 +29,21 @@ def flake8():
 
 
 @task
+def fetch_deps():
+    """
+    Fetch dependencies and install to lib directory.
+    """
+    run("pip install -r requirements.txt -t ./cloudpypi/lib/")
+
+
+@task
 def test():
     """
     Run tests.
     """
+    if not os.path.isdir('./cloudpypi/lib/'):
+        fetch_deps()
+
     sys.path.append(os.environ['GAE_SDK_ROOT'])
     sys.path.append('./tests/lib/')
     sys.path.append('./cloudpypi/lib/')
