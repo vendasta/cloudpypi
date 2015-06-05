@@ -51,7 +51,8 @@ class ComputePackageNameTests(unittest.TestCase):
 
     def test_computes_package_name(self):
         for file_result in test_files:
-            self.assertEquals(compute_package_name(file_result[0]), file_result[1])
+            self.assertEquals(compute_package_name(file_result[0]),
+                              file_result[1])
 
 
 class GetCloudStorageBucketTests(unittest.TestCase):
@@ -67,7 +68,9 @@ class GetCloudStorageBucketTests(unittest.TestCase):
 class GetCloudStorageFilenameTests(unittest.TestCase):
 
     def test_joins_to_bucket(self):
-        self.assertEquals(get_cloudstorage_filename('packages', 'pytz-2012b.tar.bz2'), '/packages/pytz-2012b.tar.bz2')
+        self.assertEquals(get_cloudstorage_filename('packages',
+                                                    'pytz-2012b.tar.bz2'),
+                          '/packages/pytz-2012b.tar.bz2')
 
     def test_raises_if_dir_marker(self):
         with self.assertRaises(AssertionError):
@@ -91,7 +94,8 @@ class ListPackagesTests(unittest.TestCase):
 
     def test_returns_list_of_filenames(self):
         with mock.patch('cloudstorage.listbucket') as list_method:
-            list_method.return_value = [MockCloudstorageFile(_file[0]) for _file in test_files]
+            list_method.return_value = [MockCloudstorageFile(_file[0])
+                                        for _file in test_files]
             files = list_packages('packages')
 
             for _file in test_files:
@@ -102,7 +106,8 @@ class ListPackageNamesTests(unittest.TestCase):
 
     def test_returns_list_of_filenames(self):
         with mock.patch('cloudstorage.listbucket') as list_method:
-            list_method.return_value = [MockCloudstorageFile(_file[0]) for _file in test_files]
+            list_method.return_value = [MockCloudstorageFile(_file[0])
+                                        for _file in test_files]
             files = list_package_names('packages', )
 
             for _file in test_files:

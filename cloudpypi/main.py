@@ -13,10 +13,10 @@ from google.appengine.ext import ndb
 
 import package_api
 
-
-JINJA_ENVIRONMENT = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-                                       extensions=['jinja2.ext.autoescape'],
-                                       autoescape=True)
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
 class configuration(object):
@@ -27,6 +27,7 @@ class configuration(object):
         self.overwrite = False
         self.pepper = "7Y52g;ygCX_rK@$96qQ,"
 
+
 config = configuration()
 
 
@@ -35,9 +36,7 @@ class UserPrefs(ndb.Model):
     password = ndb.StringProperty(required=True)
 
     def check_password(self, guess):
-        return check_password_hash(guess,
-                                   self.password,
-                                   pepper=config.pepper)
+        return check_password_hash(guess, self.password, pepper=config.pepper)
 
     @classmethod
     def create_user(cls, username, password):
@@ -87,10 +86,12 @@ class AuthenticationMiddleware(object):
             return response(environ, start_response)
         else:
             # Prompt to login if no authorization header
-            logging.info("No App Engine user. Checking HTTP basic authentication.")
+            logging.info(
+                "No App Engine user. Checking HTTP basic authentication.")
             if not request.authorization:
                 logging.info("No Auth header")
-                response = Response(status=302, location=users.create_login_url('/'))
+                response = Response(status=302,
+                                    location=users.create_login_url('/'))
                 return response(environ, start_response)
 
             auth_type, credentials = request.authorization
@@ -120,7 +121,6 @@ class AuthenticationMiddleware(object):
 
 
 class IndexHandler(webapp2.RequestHandler):
-
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render({}))
@@ -142,7 +142,8 @@ class IndexHandler(webapp2.RequestHandler):
         if "/" in content.filename:
             raise self.abort(400, detail="bad filename")
 
-        if not config.overwrite and package_api.exists(config.bucket, content.filename):
+        if not config.overwrite and package_api.exists(config.bucket,
+                                                       content.filename):
             raise self.abort(409, detail="file already exists")
 
         package_api.write(config.bucket, content.filename, content.value)
@@ -150,40 +151,41 @@ class IndexHandler(webapp2.RequestHandler):
 
 
 class SimpleIndexHandler(webapp2.RequestHandler):
-
     def get(self):
         prefixes = sorted(package_api.list_package_names(config.bucket))
 
-        context = {
-            'prefixes': prefixes
-        }
+        context = {'prefixes': prefixes}
         logging.info('Matching prefixes: %s', prefixes)
         template = JINJA_ENVIRONMENT.get_template('simple.html')
         self.response.write(template.render(**context))
 
 
 class SimpleListHandler(webapp2.RequestHandler):
-
     def get(self, package):
         packages = sorted(package_api.list_packages(config.bucket, package))
         if not packages:
             if config.redirect_to_fallback:
-                return self.redirect("%s/%s/" % (config.fallback_url.rstrip("/"), package))
+                return self.redirect("%s/%s/" %
+                                     (config.fallback_url.rstrip("/"),
+                                      package))
             return self.abort(404)
 
         context = {
             'package': package,
-            'packages': [{'url': webapp2.uri_for('packages', package=p), 'filename': p} for p in packages],
+            'packages': [
+                {'url': webapp2.uri_for('packages',
+                                        package=p),
+                 'filename': p} for p in packages
+            ],
         }
         template = JINJA_ENVIRONMENT.get_template('links.html')
         self.response.write(template.render(**context))
 
 
 class PackageDownloadHandler(webapp2.RequestHandler):
-
     def get(self, package):
         self.response.headers['Content-Type'] = 'application/x-gzip'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=%s' % package
+        self.response.headers['Content-Disposition'] = 'attachment; filename=%s' % package  # noqa
 
         data = package_api.read(config.bucket, package)
         logging.info('Downloading %s' % package)
@@ -191,7 +193,6 @@ class PackageDownloadHandler(webapp2.RequestHandler):
 
 
 class UserIndexHandler(webapp2.RequestHandler):
-
     def get(self):
         users = UserPrefs.query().fetch()
 
@@ -205,7 +206,6 @@ class UserIndexHandler(webapp2.RequestHandler):
 
 
 class UserCreateHandler(webapp2.RequestHandler):
-
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('users_create.html')
         self.response.write(template.render({}))
@@ -224,7 +224,6 @@ class UserCreateHandler(webapp2.RequestHandler):
 
 
 class UserDeleteHandler(webapp2.RequestHandler):
-
     def post(self):
         username = self.request.POST.get('username')
         if not username:
@@ -235,13 +234,32 @@ class UserDeleteHandler(webapp2.RequestHandler):
         self.redirect_to("users")
 
 
-app = webapp2.WSGIApplication([
-    webapp2.Route("/", name='index', handler=IndexHandler),
-    RedirectRoute("/simple/", name="simple", handler=SimpleIndexHandler, strict_slash=True),
-    RedirectRoute("/simple/<package>/", name="simple-list", handler=SimpleListHandler, strict_slash=True),
-    RedirectRoute("/packages/<package>/", name="packages", handler=PackageDownloadHandler, strict_slash=True),
-    RedirectRoute("/users/", name="users", handler=UserIndexHandler, strict_slash=True),
-    RedirectRoute("/users/create/", name="users-create", handler=UserCreateHandler, strict_slash=True),
-    RedirectRoute("/users/delete/", name="users-delete", handler=UserDeleteHandler, strict_slash=True),
-], debug=True)
+app = webapp2.WSGIApplication([webapp2.Route("/",
+                                             name='index',
+                                             handler=IndexHandler),
+                               RedirectRoute("/simple/",
+                                             name="simple",
+                                             handler=SimpleIndexHandler,
+                                             strict_slash=True),
+                               RedirectRoute("/simple/<package>/",
+                                             name="simple-list",
+                                             handler=SimpleListHandler,
+                                             strict_slash=True),
+                               RedirectRoute("/packages/<package>/",
+                                             name="packages",
+                                             handler=PackageDownloadHandler,
+                                             strict_slash=True),
+                               RedirectRoute("/users/",
+                                             name="users",
+                                             handler=UserIndexHandler,
+                                             strict_slash=True),
+                               RedirectRoute("/users/create/",
+                                             name="users-create",
+                                             handler=UserCreateHandler,
+                                             strict_slash=True),
+                               RedirectRoute("/users/delete/",
+                                             name="users-delete",
+                                             handler=UserDeleteHandler,
+                                             strict_slash=True), ],
+                              debug=True)
 application = AuthenticationMiddleware(app)

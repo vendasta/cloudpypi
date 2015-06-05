@@ -12,7 +12,7 @@ import cloudstorage
 
 
 _archive_suffix_re = re.compile(
-    r"(\.zip|\.tar\.gz|\.tgz|\.tar\.bz2|-py[23]\.\d-.*|\.win-amd64-py[23]\.\d\..*|\.win32-py[23]\.\d\..*)$",
+    r"(\.zip|\.tar\.gz|\.tgz|\.tar\.bz3|-py[23]\.\d-.*|\.win-amd64-py[23]\.\d\..*|\.win32-py[23]\.\d\..*)$",  # noqa
     re.IGNORECASE)
 
 
@@ -102,7 +102,9 @@ def list_packages(bucket, prefix=""):
 
     stats = cloudstorage.listbucket(path_prefix)
     if prefix:
-        packages = [os.path.basename(s.filename) for s in stats if prefix == compute_package_name(s.filename)]
+        packages = [os.path.basename(s.filename)
+                    for s in stats
+                    if prefix == compute_package_name(s.filename)]
     else:
         packages = [os.path.basename(s.filename) for s in stats]
     logging.info("list_packages with prefix %s:\n%s", prefix, packages)
@@ -116,7 +118,8 @@ def list_package_names(bucket, prefix=""):
     package_names = set()
     eggs = set()
 
-    packages = [compute_package_name(package) for package in list_packages(bucket, prefix=prefix)]
+    packages = [compute_package_name(package)
+                for package in list_packages(bucket, prefix=prefix)]
     for package in packages:
         if package.endswith(".egg"):
             eggs.add(package)
@@ -124,5 +127,6 @@ def list_package_names(bucket, prefix=""):
             package_names.add(package)
 
     all_packages = package_names.union(eggs)
-    logging.info("list_package_names with prefix %s:\n%s", prefix, all_packages)
+    logging.info("list_package_names with prefix %s:\n%s",
+                 prefix, all_packages)
     return [os.path.basename(package) for package in all_packages]
