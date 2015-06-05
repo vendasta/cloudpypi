@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>User Management</title>
+  </head>
+  <body>
+    <h1>User Management</h1>
+    {% if users %}
+      <table>
+        <thead>
+          <tr>
+              <th>Username</th>
+              <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              {{ user.username }}
+            </td>
+            <td>
+              <form method="POST" action="{{ user_delete_url  }}">
+                <input type="hidden" name="username" value="{{ user.username }}">
+                <button type="submit">Delete User</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <p><a href="{{ user_create_url }}">Create a New User</a></p>
+  </body>
+</html>
