@@ -1,4 +1,4 @@
-# CloudPyPI - minimal PyPI server for use with pip/easy_install
+# CloudPyPI - A PyPI compatible server running on App Engine
 
 [![Build Status](https://travis-ci.org/vendasta/cloudpypi.svg)](https://travis-ci.org/vendasta/cloudpypi)
 
