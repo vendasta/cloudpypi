@@ -21,7 +21,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class configuration(object):
     def __init__(self):
-        self.fallback_url = "http://pypi.python.org/simple"
+        self.fallback_url = "https://pypi.python.org/simple"
         self.bucket = "packages"
         self.redirect_to_fallback = True
         self.overwrite = False
